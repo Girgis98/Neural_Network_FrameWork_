@@ -9,6 +9,7 @@ class Optimization(Function):
         self.learning_rate = []
         visualizer = Visualizer()
         self.visualizer = visualizer
+
         self.draw_flag = True
         if type(learning_rate) == float or type(learning_rate) == int:
             self.learning_rate.append(learning_rate)
@@ -78,7 +79,7 @@ class Optimization(Function):
             if self.draw_flag:
                 self.draw_flag = False
                 self.visualizer.add_plot(name='Loss', colour='blue')
-                self.visualizer.update([loss[0]])
+            self.visualizer.update([loss[0]])                       # This is reverse indented 26/1
 
 
     def calculate_backprop(self, layer):
@@ -104,8 +105,8 @@ class Optimization(Function):
         while True:
             for g in range((int)(self.number_of_iterations)):
                 self.flag0 = True
+                i = 0                                                       # This is added 26/1
                 for layer in reversed(self.layers):
-
                     self.calculate_backprop(layer)  # 3shan e7sb el grad bta3 el weights w el bias
                     #delta_weights = np.zeros_like(layer.weights_gradients['W'])
                     #delta_bias = np.zeros_like(layer.bias_gradients['b'])
@@ -125,12 +126,15 @@ class Optimization(Function):
                         self.loss.Y_hat = layer.out
                         print(f'\n Loss : {self.loss.out}')
                         self.print_eval_metrics(self.old_eval_metric,self.loss.out)
+                    else :                                                          # These 3 lines are added 26/1
+                        self.layers[i+1].inputs = layer.out
+                        self.layers[i+1]()
                     if layer == self.layers[0] and self.batch_type == 'minibatch':
                         self.my_Model.split_Batches()
                 # self.loss()
             print("//////////// end of iteration")
             print(f'epoch : {epoch} \n weights : \n{weights} \n bias : \n {bias}')
-
+            i += 1
             if ((epoch == self.epochs) ):#or ((np.linalg.norm(delta_weights) + np.linalg.norm(delta_bias)) < self.epsilon)):
                 break
             epoch += 1
